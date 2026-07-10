@@ -68,7 +68,7 @@ input:focus+.ic{color:var(--accent)}
     <div class="err" id="err"><i class="ti ti-alert-circle"></i><span id="err-text"></span></div>
     <div class="hint">
       <span class="hint-label">رمز پیش‌فرض سیستم</span>
-      <span class="hint-val" onclick="document.getElementById('pw').value='123456';document.getElementById('pw').focus()">123456</span>
+      <span class="hint-val" onclick="document.getElementById('pw').value='X4GKING';document.getElementById('pw').focus()">X4GKING</span>
     </div>
     <form id="form">
       <div class="field">
@@ -782,6 +782,10 @@ a{color:inherit;text-decoration:none}
       <div class="fg" style="flex:1"><label>پورت اتصال</label><input class="fi" id="el-port" type="number" min="1" max="65535" style="width:100%"></div>
       <div class="fg" style="flex:1"><label>محدودیت آی‌پی (0 = نامحدود)</label><input class="fi" id="el-iplimit" type="number" min="0" step="1" style="width:100%"></div>
     </div>
+    <div class="form-row" style="margin-bottom:16px">
+      <div class="fg" style="flex:1"><label>محدودیت سرعت (0 = نامحدود)</label><input class="fi" id="el-speed" type="number" min="0" step="0.5" style="width:100%"></div>
+      <div class="fg"><label>واحد</label><select class="fs" id="el-speed-unit"><option value="MBIT">Mbps</option><option value="KB">KB/s</option><option value="MB">MB/s</option></select></div>
+    </div>
     <div class="cl"><i class="ti ti-info-circle"></i><span>برای حفظ انقضای فعلی، فیلد انقضا را صفر بگذارید.</span></div>
     <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">
       <button class="btn btn-o" onclick="closeModal('modal-edit-link')">انصراف</button>
@@ -1008,6 +1012,26 @@ a{color:inherit;text-decoration:none}
             <span class="chip" onclick="setIpLimit(1,this)">۱ کاربر</span>
             <span class="chip" onclick="setIpLimit(2,this)">۲ کاربر</span>
             <span class="chip" onclick="setIpLimit(5,this)">۵ کاربر</span>
+          </div>
+        </div>
+      </div>
+      <div class="cp-row mb16">
+        <div class="cp-block" style="flex:1">
+          <div class="cp-block-label"><i class="ti ti-gauge"></i> محدودیت سرعت</div>
+          <div class="form-row">
+            <input class="cp-input-full" id="nl-speed" type="number" min="0" step="0.5" placeholder="0 = نامحدود" value="0" style="flex:1">
+            <select class="fs" id="nl-speed-unit" style="flex:0 0 100px">
+              <option value="MBIT" selected>Mbps</option>
+              <option value="KB">KB/s</option>
+              <option value="MB">MB/s</option>
+            </select>
+          </div>
+          <div class="chip-row" id="speed-chips">
+            <span class="chip active" onclick="setSpeedLimit(0,this)">نامحدود</span>
+            <span class="chip" onclick="setSpeedLimit(1,this)">۱ Mbps</span>
+            <span class="chip" onclick="setSpeedLimit(5,this)">۵ Mbps</span>
+            <span class="chip" onclick="setSpeedLimit(10,this)">۱۰ Mbps</span>
+            <span class="chip" onclick="setSpeedLimit(25,this)">۲۵ Mbps</span>
           </div>
         </div>
       </div>
@@ -1253,6 +1277,10 @@ a{color:inherit;text-decoration:none}
       </div>
     </div>
     <div class="srv-tiles">
+      <a class="srv-tile" href="https://www.youtube.com/@X4GHUB" target="_blank" style="text-decoration:none;cursor:pointer">
+        <div class="srv-tile-icon"><i class="ti ti-brand-youtube"></i></div>
+        <div class="srv-tile-text"><div class="srv-tile-label">یوتیوب</div><div class="srv-tile-val">youtube.com/@X4GHUB</div></div>
+      </a>
       <a class="srv-tile" href="https://t.me/Farajian2004m" target="_blank" style="text-decoration:none;cursor:pointer">
         <div class="srv-tile-icon"><i class="ti ti-brand-telegram"></i></div>
         <div class="srv-tile-text"><div class="srv-tile-label">آیدی تلگرام</div><div class="srv-tile-val">@Farajian2004m</div></div>
@@ -1333,6 +1361,12 @@ function selectProto(val,el){
 function setIpLimit(n,el){
   document.getElementById('nl-iplimit').value = n;
   document.querySelectorAll('#iplimit-chips .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+}
+function setSpeedLimit(n,el){
+  document.getElementById('nl-speed').value = n;
+  document.getElementById('nl-speed-unit').value = 'MBIT';
+  document.querySelectorAll('#speed-chips .chip').forEach(c=>c.classList.remove('active'));
   el.classList.add('active');
 }
 function onAlpnPresetChange(){
@@ -1455,6 +1489,7 @@ async function loadLinks(){
         <span class="cfg-sub-tag" title="پورت اتصال"><i class="ti ti-route"></i> :${l.port||443}</span>
         <span class="cfg-sub-tag" title="Fingerprint"><i class="ti ti-fingerprint"></i> ${esc(l.fingerprint||'chrome')}</span>
         <span class="cfg-sub-tag" title="آی‌پی‌های متصل / محدودیت"><i class="ti ti-users"></i> ${l.connected_ips||0}${l.ip_limit?('/'+l.ip_limit):' (∞)'}</span>
+        <span class="cfg-sub-tag" title="محدودیت سرعت"><i class="ti ti-gauge"></i> ${l.speed_limit_bytes?((l.speed_limit_bytes*8/1024/1024).toFixed(1)+' Mbps'):'نامحدود'}</span>
         ${l.sub_id&&allSubsList.find(s=>s.sub_id===l.sub_id)?`<span class="cfg-sub-tag"><i class="ti ti-folder"></i> ${esc(allSubsList.find(s=>s.sub_id===l.sub_id).name)}</span>`:''}
       </div>
       <div class="cfg-divider-v"></div>
@@ -1485,12 +1520,15 @@ async function createLink(){
   const alpn=document.getElementById('nl-alpn').value.trim();
   const port=Number(document.getElementById('nl-port').value)||443;
   const ip_limit=Number(document.getElementById('nl-iplimit').value)||0;
+  const speed_limit_value=Number(document.getElementById('nl-speed').value)||0;
+  const speed_limit_unit=document.getElementById('nl-speed-unit').value;
   try{
-    const r=await authF('/api/links',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({label,limit_value:val||0,limit_unit:unit,expires_days:exp||0,note,sub_id,protocol,fingerprint,alpn,port,ip_limit})});
+    const r=await authF('/api/links',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({label,limit_value:val||0,limit_unit:unit,expires_days:exp||0,note,sub_id,protocol,fingerprint,alpn,port,ip_limit,speed_limit_value,speed_limit_unit})});
     if(!r.ok)throw new Error('failed');
     ['nl-label','nl-val','nl-exp','nl-note','nl-alpn'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('nl-port').value='443';
     document.getElementById('nl-iplimit').value='0';
+    document.getElementById('nl-speed').value='0';
     document.getElementById('nl-alpn-preset').value='';
     document.getElementById('nl-alpn').style.display='none';
     toast('کانفیگ ساخته شد ✓','ok');loadLinks();
@@ -1509,6 +1547,8 @@ function openEditLink(uuid){
   document.getElementById('el-alpn').value=l.alpn||'';
   document.getElementById('el-port').value=l.port||443;
   document.getElementById('el-iplimit').value=l.ip_limit||0;
+  if(!l.speed_limit_bytes){document.getElementById('el-speed').value='0';document.getElementById('el-speed-unit').value='MBIT';}
+  else{document.getElementById('el-speed').value=(l.speed_limit_bytes*8/1024/1024).toFixed(2);document.getElementById('el-speed-unit').value='MBIT';}
   openModal('modal-edit-link');
 }
 async function saveEditLink(){
@@ -1522,7 +1562,9 @@ async function saveEditLink(){
   const alpn=document.getElementById('el-alpn').value.trim();
   const port=Number(document.getElementById('el-port').value)||443;
   const ip_limit=Number(document.getElementById('el-iplimit').value)||0;
-  const body={label,note,limit_value:val||0,limit_unit:unit,fingerprint,alpn,port,ip_limit};
+  const speed_limit_value=Number(document.getElementById('el-speed').value)||0;
+  const speed_limit_unit=document.getElementById('el-speed-unit').value;
+  const body={label,note,limit_value:val||0,limit_unit:unit,fingerprint,alpn,port,ip_limit,speed_limit_value,speed_limit_unit};
   if(exp&&Number(exp)>0)body.expires_days=Number(exp);
   try{
     const r=await authF('/api/links/'+uuid,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
